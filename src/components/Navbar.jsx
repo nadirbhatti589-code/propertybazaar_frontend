@@ -33,6 +33,9 @@ const Navbar = () => {
               <Link to="/favorites" className="text-sm text-gray-700 hover:text-primary-600">
                 Favorites
               </Link>
+              <Link to="/agent-verification" className="text-sm text-gray-700 hover:text-primary-600">
+                Become an Agent
+              </Link>
               <span className="text-sm text-gray-500 hidden sm:inline">Hi, {user.name.split(' ')[0]}</span>
               <button
                 onClick={handleLogout}

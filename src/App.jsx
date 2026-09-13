@@ -8,6 +8,7 @@ import Signup from './pages/Signup';
 import PostProperty from './pages/PostProperty';
 import MyListings from './pages/MyListings';
 import Favorites from './pages/Favorites';
+import AgentVerification from './pages/AgentVerification';
 
 function App() {
   return (
@@ -41,6 +42,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Favorites />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/agent-verification"
+          element={
+            <ProtectedRoute>
+              <AgentVerification />
             </ProtectedRoute>
           }
         />
