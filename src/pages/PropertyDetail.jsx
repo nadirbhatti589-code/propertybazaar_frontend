@@ -4,144 +4,39 @@ import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 
 const PropertyDetail = () => {
-  const { id } = useParams();
-  const { user } = useAuth();
-  const [property, setProperty] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [message, setMessage] = useState('');
-  const [inquiryStatus, setInquiryStatus] = useState('');
+  const { id } = useParams(); const { user } = useAuth();
+  const [property, setProperty] = useState(null); const [loading, setLoading] = useState(true); const [message, setMessage] = useState(''); const [inquiryStatus, setInquiryStatus] = useState(''); const [activeImage, setActiveImage] = useState(0);
+  useEffect(() => { const fetchProperty = async () => { try { const { data } = await api.get(`/properties/${id}`); setProperty(data.property); } catch (err) { /* property not found or server error */ } finally { setLoading(false); } }; fetchProperty(); }, [id]);
+  const handleInquiry = async (e) => { e.preventDefault(); setInquiryStatus(''); try { await api.post('/inquiries', { propertyId: id, message }); setInquiryStatus('Message sent! The owner will be in touch.'); setMessage(''); } catch (err) { setInquiryStatus(err.response?.data?.message || 'Failed to send message'); } };
+  const handleFavorite = async () => { try { await api.post(`/favorites/${id}`); alert('Added to favorites'); } catch (err) { alert(err.response?.data?.message || 'Failed to add favorite'); } };
+  if (loading) return <p className="py-20 text-center text-sand-600">Loading...</p>;
+  if (!property) return <p className="py-20 text-center text-sand-600">Property not found.</p>;
+  const images = property.images || [];
 
-  useEffect(() => {
-    const fetchProperty = async () => {
-      try {
-        const { data } = await api.get(`/properties/${id}`);
-        setProperty(data.property);
-      } catch (err) {
-        // property not found or server error
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProperty();
-  }, [id]);
-
-  const handleInquiry = async (e) => {
-    e.preventDefault();
-    setInquiryStatus('');
-    try {
-      await api.post('/inquiries', { propertyId: id, message });
-      setInquiryStatus('Message sent! The owner will be in touch.');
-      setMessage('');
-    } catch (err) {
-      setInquiryStatus(err.response?.data?.message || 'Failed to send message');
-    }
-  };
-
-  const handleFavorite = async () => {
-    try {
-      await api.post(`/favorites/${id}`);
-      alert('Added to favorites');
-    } catch (err) {
-      alert(err.response?.data?.message || 'Failed to add favorite');
-    }
-  };
-
-  if (loading) return <p className="text-center py-20 text-gray-500">Loading...</p>;
-  if (!property) return <p className="text-center py-20 text-gray-500">Property not found.</p>;
-
-  return (
-    <div className="max-w-5xl mx-auto px-4 py-6">
-      <div className="h-72 bg-gray-100 rounded-lg mb-6 flex items-center justify-center overflow-hidden">
-        {property.images && property.images.length > 0 ? (
-          <img src={property.images[0]} alt={property.title} className="w-full h-full object-cover" />
-        ) : (
-          <span className="text-gray-400">No image available</span>
-        )}
+  return <main className="mx-auto max-w-7xl px-4 py-7 sm:py-10">
+    <div className="mb-8">
+      <div className="relative flex h-72 items-center justify-center overflow-hidden rounded-lg bg-sand-100 sm:h-[28rem]">
+        {images.length ? <img src={images[activeImage]} alt={`${property.title} — image ${activeImage + 1}`} className="h-full w-full object-cover" /> : <div className="text-center text-sand-600"><span className="font-display text-2xl">A place awaiting its portrait</span><p className="mt-1 text-sm">No images have been added yet.</p></div>}
+        {images.length > 1 && <span className="absolute bottom-3 right-3 rounded-full bg-ink/75 px-3 py-1 text-xs font-medium text-paper">{activeImage + 1} / {images.length}</span>}
       </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <h1 className="text-2xl font-bold text-gray-900">{property.title}</h1>
-          <p className="text-gray-500 mb-3">
-            {property.area}, {property.city}
-          </p>
-          <p className="text-2xl font-bold text-primary-600 mb-4">
-            PKR {property.price.toLocaleString()}
-            {property.priceUnit && <span className="text-base font-normal text-gray-500"> /{property.priceUnit}</span>}
-          </p>
-
-          <div className="flex gap-6 text-sm text-gray-700 border-y py-3 mb-4">
-            {property.category !== 'plot' && (
-              <>
-                <span>{property.bedrooms ?? '-'} Bedrooms</span>
-                <span>{property.bathrooms ?? '-'} Bathrooms</span>
-              </>
-            )}
-            <span>
-              {property.areaSize} {property.areaUnit}
-            </span>
-            <span className="capitalize">{property.category}</span>
-          </div>
-
-          <h2 className="font-semibold text-gray-900 mb-2">Description</h2>
-          <p className="text-gray-700 mb-4 whitespace-pre-line">{property.description}</p>
-
-          {property.amenities && property.amenities.length > 0 && (
-            <>
-              <h2 className="font-semibold text-gray-900 mb-2">Amenities</h2>
-              <div className="flex flex-wrap gap-2 mb-4">
-                {property.amenities.map((a) => (
-                  <span key={a} className="bg-gray-100 text-gray-700 text-xs px-3 py-1 rounded-full">
-                    {a}
-                  </span>
-                ))}
-              </div>
-            </>
-          )}
-        </div>
-
-        <div>
-          <div className="border border-gray-200 rounded-lg p-4 mb-4">
-            <h3 className="font-semibold text-gray-900 mb-1">Posted by</h3>
-            <p className="text-gray-700">{property.postedBy?.name}</p>
-            {property.postedBy?.phone && <p className="text-sm text-gray-500">{property.postedBy.phone}</p>}
-          </div>
-
-          {user ? (
-            <div className="border border-gray-200 rounded-lg p-4 mb-4">
-              <h3 className="font-semibold text-gray-900 mb-2">Send an inquiry</h3>
-              <form onSubmit={handleInquiry}>
-                <textarea
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  placeholder="I'm interested in this property..."
-                  required
-                  rows={4}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm mb-2"
-                />
-                <button
-                  type="submit"
-                  className="w-full bg-primary-600 hover:bg-primary-700 text-white rounded-md py-2 text-sm font-medium"
-                >
-                  Send Message
-                </button>
-              </form>
-              {inquiryStatus && <p className="text-sm text-gray-600 mt-2">{inquiryStatus}</p>}
-            </div>
-          ) : (
-            <p className="text-sm text-gray-500 mb-4">Log in to contact the owner.</p>
-          )}
-
-          <button
-            onClick={handleFavorite}
-            className="w-full border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-md py-2 text-sm font-medium"
-          >
-            ♥ Save to Favorites
-          </button>
-        </div>
-      </div>
+      {images.length > 1 && <div className="mt-3 flex gap-2 overflow-x-auto pb-1">{images.map((image, index) => <button key={`${image}-${index}`} type="button" onClick={() => setActiveImage(index)} aria-label={`View image ${index + 1}`} className={`h-16 w-20 shrink-0 overflow-hidden rounded-md border-2 transition-colors sm:h-20 sm:w-28 ${activeImage === index ? 'border-teal-500' : 'border-transparent hover:border-sand-400'}`}><img src={image} alt="" className="h-full w-full object-cover" /></button>)}</div>}
     </div>
-  );
-};
 
+    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_22rem]">
+      <article>
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-500">{property.listingType === 'rent' ? 'For rent' : 'For sale'} · {property.category}</p>
+        <h1 className="mt-2 font-display text-3xl font-semibold leading-tight text-ink sm:text-4xl">{property.title}</h1>
+        <p className="mt-2 text-sm text-sand-600">{property.area}, {property.city}</p>
+        <p className="mt-6 font-display text-3xl font-semibold text-brand-500 sm:text-4xl">PKR {property.price.toLocaleString()}{property.priceUnit && <span className="font-sans text-base font-normal text-sand-600"> /{property.priceUnit}</span>}</p>
+        <div className="my-7 grid grid-cols-2 border-y border-sand-200 sm:grid-cols-4">
+          {property.category !== 'plot' && <><div className="py-4"><p className="text-lg font-semibold text-ink">{property.bedrooms ?? '-'}</p><p className="text-xs uppercase tracking-wide text-sand-600">Bedrooms</p></div><div className="py-4"><p className="text-lg font-semibold text-ink">{property.bathrooms ?? '-'}</p><p className="text-xs uppercase tracking-wide text-sand-600">Bathrooms</p></div></>}
+          <div className="py-4"><p className="text-lg font-semibold text-ink">{property.areaSize}</p><p className="text-xs uppercase tracking-wide text-sand-600">{property.areaUnit}</p></div><div className="py-4"><p className="text-lg font-semibold capitalize text-ink">{property.category}</p><p className="text-xs uppercase tracking-wide text-sand-600">Property type</p></div>
+        </div>
+        <section><h2 className="font-display text-2xl font-semibold text-ink">About this property</h2><p className="mt-3 whitespace-pre-line leading-7 text-sand-600">{property.description}</p></section>
+        {property.amenities?.length > 0 && <section className="mt-8"><h2 className="font-display text-2xl font-semibold text-ink">Amenities</h2><div className="mt-3 flex flex-wrap gap-2">{property.amenities.map((a, index) => <span key={`${a}-${index}`} className={`rounded-full px-3 py-1.5 text-xs font-medium ${index % 2 ? 'bg-teal-50 text-teal-600' : 'bg-sand-100 text-ink'}`}>{a}</span>)}</div></section>}
+      </article>
+      <aside className="lg:sticky lg:top-24 lg:self-start"><div className="border border-sand-200 bg-white p-5 shadow-[0_12px_30px_rgba(43,36,32,0.06)]"><div className="border-b border-sand-200 pb-4"><p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-500">Listed by</p><h3 className="mt-1 font-display text-xl font-semibold text-ink">{property.postedBy?.name || 'Property owner'}</h3>{property.postedBy?.phone && <p className="mt-1 text-sm text-sand-600">{property.postedBy.phone}</p>}</div>{user ? <div className="pt-5"><h3 className="font-display text-xl font-semibold text-ink">Make an inquiry</h3><p className="mt-1 text-sm text-sand-600">Ask a question or arrange a viewing.</p><form onSubmit={handleInquiry} className="mt-4"><textarea value={message} onChange={(e) => setMessage(e.target.value)} placeholder="I'm interested in this property..." required rows={4} className="form-input resize-none" /><button type="submit" className="btn-primary mt-3 w-full">Send Message</button></form>{inquiryStatus && <p className="mt-3 text-sm text-teal-600">{inquiryStatus}</p>}</div> : <p className="pt-5 text-sm leading-6 text-sand-600">Log in to contact the owner and arrange a viewing.</p>}<button onClick={handleFavorite} className="btn-secondary mt-5 w-full">♥ Save to Favorites</button></div></aside>
+    </div>
+  </main>;
+};
 export default PropertyDetail;

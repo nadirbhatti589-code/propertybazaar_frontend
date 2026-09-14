@@ -11,52 +11,52 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
-        <Link to="/" className="text-xl font-bold text-primary-600">
-          PropertyBazaar
+    <nav className="sticky top-0 z-50 border-b border-sand-200 bg-paper/95 backdrop-blur">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
+        <Link to="/" className="font-display text-xl font-semibold text-brand-500">
+          Property<span className="text-teal-600">Bazaar</span>
         </Link>
 
-        <div className="flex items-center gap-4">
-          <Link to="/" className="text-sm text-gray-700 hover:text-primary-600">
+        <div className="flex items-center gap-3 sm:gap-4">
+          <Link to="/" className="text-sm text-ink hover:text-brand-500">
             Browse
           </Link>
 
           {user ? (
             <>
-              <Link to="/post-property" className="text-sm text-gray-700 hover:text-primary-600">
+              <Link to="/post-property" className="hidden text-sm text-ink hover:text-brand-500 sm:inline">
                 Post Property
               </Link>
-              <Link to="/my-listings" className="text-sm text-gray-700 hover:text-primary-600">
+              <Link to="/my-listings" className="hidden text-sm text-ink hover:text-brand-500 md:inline">
                 My Listings
               </Link>
-              <Link to="/favorites" className="text-sm text-gray-700 hover:text-primary-600">
+              <Link to="/favorites" className="hidden text-sm text-ink hover:text-brand-500 sm:inline">
                 Favorites
               </Link>
-              <Link to="/agent-verification" className="text-sm text-gray-700 hover:text-primary-600">
+              <Link to="/agent-verification" className="hidden text-sm text-ink hover:text-brand-500 lg:inline">
                 Become an Agent
               </Link>
               {user.role === 'admin' && (
-                <Link to="/admin" className="text-sm font-medium text-purple-600 hover:text-purple-700">
+                <Link to="/admin" className="text-sm font-medium text-teal-600 hover:text-teal-500">
                   Admin Panel
                 </Link>
               )}
-              <span className="text-sm text-gray-500 hidden sm:inline">Hi, {user.name.split(' ')[0]}</span>
+              <span className="hidden text-sm text-sand-600 xl:inline">Hi, {user.name.split(' ')[0]}</span>
               <button
                 onClick={handleLogout}
-                className="text-sm bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-md"
+                className="rounded-md bg-sand-100 px-3 py-1.5 text-sm font-medium text-ink hover:bg-sand-200"
               >
                 Logout
               </button>
             </>
           ) : (
             <>
-              <Link to="/login" className="text-sm text-gray-700 hover:text-primary-600">
+              <Link to="/login" className="text-sm text-ink hover:text-brand-500">
                 Login
               </Link>
               <Link
                 to="/signup"
-                className="text-sm bg-primary-600 hover:bg-primary-700 text-white px-4 py-1.5 rounded-md"
+                className="rounded-md bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600"
               >
                 Sign Up
               </Link>

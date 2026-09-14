@@ -32,16 +32,15 @@ const Home = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6">
-      <h1 className="text-2xl font-bold text-gray-900 mb-4">Find Your Next Property</h1>
+    <main className="mx-auto max-w-7xl px-4 py-8"><div className="mb-5"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-500">Pakistan property marketplace</p><h1 className="mt-1 font-display text-3xl font-semibold text-ink sm:text-4xl">Find your next place.</h1></div>
 
       <SearchFilters onSearch={handleSearch} />
 
-      {loading && <p className="text-center text-gray-500 py-10">Loading properties...</p>}
-      {error && <p className="text-center text-red-500 py-10">{error}</p>}
+      {loading && <p className="py-10 text-center text-sand-600">Loading properties...</p>}
+      {error && <p className="py-10 text-center text-brand-500">{error}</p>}
 
       {!loading && !error && properties.length === 0 && (
-        <p className="text-center text-gray-500 py-10">No properties found. Try adjusting your filters.</p>
+        <p className="py-10 text-center text-sand-600">No properties found. Try adjusting your filters.</p>
       )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
@@ -49,7 +48,7 @@ const Home = () => {
           <PropertyCard key={property._id} property={property} />
         ))}
       </div>
-    </div>
+    </main>
   );
 };
 

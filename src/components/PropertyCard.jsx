@@ -13,35 +13,35 @@ const PropertyCard = ({ property }) => {
   return (
     <Link
       to={`/property/${_id}`}
-      className="block bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow"
+      className="group block overflow-hidden border border-sand-200 bg-white transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-0.5 hover:border-sand-400 hover:shadow-[0_14px_28px_rgba(43,36,32,0.09)]"
     >
-      <div className="h-44 bg-gray-100 flex items-center justify-center overflow-hidden">
+      <div className="flex h-44 items-center justify-center overflow-hidden bg-sand-100">
         {images && images.length > 0 ? (
           <img src={images[0]} alt={title} className="w-full h-full object-cover" />
         ) : (
-          <span className="text-gray-400 text-sm">No image</span>
+          <span className="text-sm text-sand-600">No image</span>
         )}
       </div>
 
       <div className="p-4">
         <div className="flex items-center justify-between mb-1">
-          <span className="text-xs uppercase font-semibold text-primary-600">
+          <span className="text-xs font-semibold uppercase tracking-[0.12em] text-teal-600">
             {listingType === 'rent' ? 'For Rent' : 'For Sale'}
           </span>
-          <span className="text-xs text-gray-400 capitalize">{category}</span>
+          <span className="text-xs text-sand-600 capitalize">{category}</span>
         </div>
 
-        <h3 className="font-semibold text-gray-900 truncate">{title}</h3>
-        <p className="text-sm text-gray-500 mb-2">
+        <h3 className="font-display font-semibold text-ink truncate group-hover:text-brand-500">{title}</h3>
+        <p className="mb-2 text-sm text-sand-600">
           {area}, {city}
         </p>
 
-        <p className="text-lg font-bold text-gray-900 mb-2">
+        <p className="mb-2 font-display text-xl font-semibold text-ink">
           PKR {formatPrice(price)}
-          {priceUnit && <span className="text-sm font-normal text-gray-500"> /{priceUnit}</span>}
+          {priceUnit && <span className="font-sans text-sm font-normal text-sand-600"> /{priceUnit}</span>}
         </p>
 
-        <div className="flex gap-3 text-sm text-gray-600 border-t pt-2">
+        <div className="flex gap-3 border-t border-sand-200 pt-2 text-sm text-sand-600">
           {category !== 'plot' && (
             <>
               <span>{bedrooms ?? '-'} Beds</span>

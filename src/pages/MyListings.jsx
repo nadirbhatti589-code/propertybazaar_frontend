@@ -2,88 +2,12 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api/axios';
 
-const statusColors = {
-  available: 'bg-green-100 text-green-700',
-  pending_approval: 'bg-yellow-100 text-yellow-700',
-  rejected: 'bg-red-100 text-red-700',
-  sold: 'bg-gray-100 text-gray-700',
-  rented: 'bg-gray-100 text-gray-700',
-};
-
+const statusColors = { available: 'bg-teal-50 text-teal-600', pending_approval: 'bg-gold-400/20 text-gold-500', rejected: 'bg-brand-50 text-brand-500', sold: 'bg-sand-100 text-sand-600', rented: 'bg-sand-100 text-sand-600' };
 const MyListings = () => {
-  const [properties, setProperties] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchMine = async () => {
-      try {
-        const { data } = await api.get('/properties/mine');
-        setProperties(data.properties);
-      } catch (err) {
-        // ignore for now
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchMine();
-  }, []);
-
-  const handleDelete = async (id) => {
-    if (!confirm('Delete this listing?')) return;
-    try {
-      await api.delete(`/properties/${id}`);
-      setProperties((prev) => prev.filter((p) => p._id !== id));
-    } catch (err) {
-      alert(err.response?.data?.message || 'Failed to delete');
-    }
-  };
-
-  if (loading) return <p className="text-center py-20 text-gray-500">Loading...</p>;
-
-  return (
-    <div className="max-w-5xl mx-auto px-4 py-6">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">My Listings</h1>
-        <Link to="/post-property" className="bg-primary-600 hover:bg-primary-700 text-white text-sm px-4 py-2 rounded-md">
-          + Post New Property
-        </Link>
-      </div>
-
-      {properties.length === 0 ? (
-        <p className="text-gray-500">You haven't posted any properties yet.</p>
-      ) : (
-        <div className="space-y-3">
-          {properties.map((p) => (
-            <div
-              key={p._id}
-              className="border border-gray-200 rounded-lg p-4 flex items-center justify-between"
-            >
-              <div>
-                <Link to={`/property/${p._id}`} className="font-medium text-gray-900 hover:text-primary-600">
-                  {p.title}
-                </Link>
-                <p className="text-sm text-gray-500">
-                  {p.area}, {p.city} · PKR {p.price.toLocaleString()}
-                </p>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <span className={`text-xs px-2 py-1 rounded-full ${statusColors[p.status] || 'bg-gray-100 text-gray-700'}`}>
-                  {p.status.replace('_', ' ')}
-                </span>
-                <button
-                  onClick={() => handleDelete(p._id)}
-                  className="text-sm text-red-500 hover:underline"
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+  const [properties, setProperties] = useState([]); const [loading, setLoading] = useState(true);
+  useEffect(() => { const fetchMine = async () => { try { const { data } = await api.get('/properties/mine'); setProperties(data.properties); } catch (err) { /* ignore for now */ } finally { setLoading(false); } }; fetchMine(); }, []);
+  const handleDelete = async (id) => { if (!confirm('Delete this listing?')) return; try { await api.delete(`/properties/${id}`); setProperties((prev) => prev.filter((p) => p._id !== id)); } catch (err) { alert(err.response?.data?.message || 'Failed to delete'); } };
+  if (loading) return <p className="py-20 text-center text-sand-600">Loading...</p>;
+  return <main className="mx-auto max-w-5xl px-4 py-8"><div className="mb-7 flex items-center justify-between gap-4"><div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-500">Your portfolio</p><h1 className="section-heading mt-1">My Listings</h1></div><Link to="/post-property" className="btn-primary shrink-0 text-center">+ Post New Property</Link></div>{properties.length === 0 ? <div className="border border-dashed border-sand-400 bg-sand-100/60 px-6 py-14 text-center"><p className="font-display text-2xl font-semibold text-ink">Your first listing begins here.</p><p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-sand-600">Show buyers what makes a property special, from its location to the details that make it feel like home.</p><Link to="/post-property" className="btn-primary mt-6 inline-block">Post a Property</Link></div> : <div className="space-y-3">{properties.map((p) => <div key={p._id} className="flex flex-col gap-4 border-l-4 border-sand-200 bg-white p-5 shadow-[0_8px_22px_rgba(43,36,32,0.04)] sm:flex-row sm:items-center sm:justify-between"><div><Link to={`/property/${p._id}`} className="font-display text-lg font-semibold text-ink hover:text-brand-500">{p.title}</Link><p className="mt-1 text-sm text-sand-600">{p.area}, {p.city} · PKR {p.price.toLocaleString()}</p></div><div className="flex items-center gap-3"><span className={`rounded-full px-3 py-1 text-xs font-semibold capitalize ${statusColors[p.status] || 'bg-sand-100 text-sand-600'}`}>{p.status.replace('_', ' ')}</span><button onClick={() => handleDelete(p._id)} className="text-sm font-medium text-brand-500 hover:text-brand-700 hover:underline">Delete</button></div></div>)}</div>}</main>;
 };
-
 export default MyListings;

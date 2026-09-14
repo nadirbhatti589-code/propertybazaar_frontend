@@ -25,7 +25,7 @@ const SearchFilters = ({ onSearch }) => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-white border border-gray-200 rounded-lg p-4 mb-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3"
+      className="mb-8 grid grid-cols-2 gap-3 border border-sand-200 bg-white p-4 sm:grid-cols-3 lg:grid-cols-7"
     >
       <input
         type="text"
@@ -33,14 +33,14 @@ const SearchFilters = ({ onSearch }) => {
         placeholder="Search by keyword..."
         value={filters.search}
         onChange={handleChange}
-        className="col-span-2 lg:col-span-2 border border-gray-300 rounded-md px-3 py-2 text-sm"
+        className="form-input col-span-2 lg:col-span-2"
       />
 
       <select
         name="listingType"
         value={filters.listingType}
         onChange={handleChange}
-        className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+        className="form-input"
       >
         <option value="">Buy / Rent</option>
         <option value="buy">Buy</option>
@@ -51,7 +51,7 @@ const SearchFilters = ({ onSearch }) => {
         name="category"
         value={filters.category}
         onChange={handleChange}
-        className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+        className="form-input"
       >
         <option value="">All Types</option>
         <option value="house">House</option>
@@ -65,7 +65,7 @@ const SearchFilters = ({ onSearch }) => {
         placeholder="City"
         value={filters.city}
         onChange={handleChange}
-        className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+        className="form-input"
       />
 
       <input
@@ -74,7 +74,7 @@ const SearchFilters = ({ onSearch }) => {
         placeholder="Min Price"
         value={filters.minPrice}
         onChange={handleChange}
-        className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+        className="form-input"
       />
 
       <input
@@ -83,12 +83,12 @@ const SearchFilters = ({ onSearch }) => {
         placeholder="Max Price"
         value={filters.maxPrice}
         onChange={handleChange}
-        className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+        className="form-input"
       />
 
       <button
         type="submit"
-        className="col-span-2 sm:col-span-1 lg:col-span-7 bg-primary-600 hover:bg-primary-700 text-white rounded-md py-2 text-sm font-medium"
+        className="btn-primary col-span-2 sm:col-span-1 lg:col-span-7"
       >
         Search
       </button>
