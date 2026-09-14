@@ -36,6 +36,11 @@ const Navbar = () => {
               <Link to="/agent-verification" className="text-sm text-gray-700 hover:text-primary-600">
                 Become an Agent
               </Link>
+              {user.role === 'admin' && (
+                <Link to="/admin" className="text-sm font-medium text-purple-600 hover:text-purple-700">
+                  Admin Panel
+                </Link>
+              )}
               <span className="text-sm text-gray-500 hidden sm:inline">Hi, {user.name.split(' ')[0]}</span>
               <button
                 onClick={handleLogout}
