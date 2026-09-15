@@ -40,6 +40,14 @@ function App() {
           }
         />
         <Route
+          path="/edit-property/:id"
+          element={
+            <ProtectedRoute>
+              <PostProperty />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/my-listings"
           element={
             <ProtectedRoute>

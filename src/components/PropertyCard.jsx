@@ -17,7 +17,7 @@ const PropertyCard = ({ property }) => {
     >
       <div className="flex h-44 items-center justify-center overflow-hidden bg-sand-100">
         {images && images.length > 0 ? (
-          <img src={images[0]} alt={title} className="w-full h-full object-cover" />
+          <img src={typeof images[0] === 'string' ? images[0] : images[0].url} alt={title} className="w-full h-full object-cover" />
         ) : (
           <span className="text-sm text-sand-600">No image</span>
         )}
