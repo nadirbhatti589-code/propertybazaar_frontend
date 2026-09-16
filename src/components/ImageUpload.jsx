@@ -14,14 +14,39 @@ const ImageUpload = ({ images = [], onChange }) => {
   const uploadFiles = async (files) => {
     const selected = Array.from(files || []).filter((file) => file.type.startsWith('image/'));
     if (!selected.length) return;
-    if (orderedImages.length + selected.length > 10) { setError('You can upload a maximum of 10 images.'); return; }
-    setError(''); setUploading(true);
+    if (orderedImages.length + selected.length > 10) {
+      setError('You can upload a maximum of 10 images.');
+      return;
+    }
+
+    // Check individual file sizes (max 4.5MB for Vercel serverless functions)
+    const MAX_SIZE = 4.5 * 1024 * 1024;
+    const oversized = selected.find((file) => file.size > MAX_SIZE);
+    if (oversized) {
+      setError(`"${oversized.name}" exceeds the 4.5MB size limit. Please choose a smaller image.`);
+      return;
+    }
+
+    setError('');
+    setUploading(true);
     try {
-      const body = new FormData(); selected.forEach((file) => body.append('images', file));
-      const { data } = await api.post('/upload', body, { headers: { 'Content-Type': 'multipart/form-data' } });
-      onChange([...orderedImages, ...(data.images || [])].map(normaliseImage));
-    } catch (err) { setError(err.response?.data?.message || 'Images could not be uploaded. Please try again.'); }
-    finally { setUploading(false); }
+      // Upload each file independently so requests stay well under Vercel serverless payload limits
+      // Note: do NOT manually specify 'Content-Type': 'multipart/form-data', as Axios needs to set the boundary!
+      const uploadPromises = selected.map(async (file) => {
+        const body = new FormData();
+        body.append('images', file);
+        const { data } = await api.post('/upload', body);
+        return data.images || [];
+      });
+
+      const uploadedBatches = await Promise.all(uploadPromises);
+      const newImages = uploadedBatches.flat();
+      onChange([...orderedImages, ...newImages].map(normaliseImage));
+    } catch (err) {
+      setError(err.response?.data?.message || 'Images could not be uploaded. Please try again.');
+    } finally {
+      setUploading(false);
+    }
   };
 
   const moveImage = (from, to) => {
