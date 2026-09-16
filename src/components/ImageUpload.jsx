@@ -3,6 +3,55 @@ import api from '../api/axios';
 
 const normaliseImage = (image, order) => (typeof image === 'string' ? { url: image, publicId: null, order } : { ...image, order });
 
+const compressImageIfNeeded = async (file) => {
+  // If file is smaller than 3MB, no compression needed
+  if (file.size <= 3 * 1024 * 1024) return file;
+
+  return new Promise((resolve) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const canvas = document.createElement('canvas');
+      let { width, height } = img;
+      const MAX_DIM = 1920;
+      if (width > MAX_DIM || height > MAX_DIM) {
+        if (width > height) {
+          height = Math.round((height * MAX_DIM) / width);
+          width = MAX_DIM;
+        } else {
+          width = Math.round((width * MAX_DIM) / height);
+          height = MAX_DIM;
+        }
+      }
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      canvas.toBlob(
+        (blob) => {
+          if (blob && blob.size < file.size) {
+            const compressedFile = new File([blob], file.name.replace(/\.[^/.]+$/, '.jpg'), {
+              type: 'image/jpeg',
+              lastModified: Date.now(),
+            });
+            resolve(compressedFile);
+          } else {
+            resolve(file);
+          }
+        },
+        'image/jpeg',
+        0.82
+      );
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      resolve(file);
+    };
+    img.src = url;
+  });
+};
+
 const ImageUpload = ({ images = [], onChange }) => {
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -19,20 +68,23 @@ const ImageUpload = ({ images = [], onChange }) => {
       return;
     }
 
-    // Check individual file sizes (max 4.5MB for Vercel serverless functions)
-    const MAX_SIZE = 4.5 * 1024 * 1024;
-    const oversized = selected.find((file) => file.size > MAX_SIZE);
-    if (oversized) {
-      setError(`"${oversized.name}" exceeds the 4.5MB size limit. Please choose a smaller image.`);
-      return;
-    }
-
     setError('');
     setUploading(true);
     try {
+      // Auto-compress large phone camera photos (>3MB) so they smoothly fit under 4.5MB
+      const preparedFiles = await Promise.all(selected.map(compressImageIfNeeded));
+
+      // Check individual file sizes (max 4.5MB for Vercel serverless functions)
+      const MAX_SIZE = 4.5 * 1024 * 1024;
+      const oversized = preparedFiles.find((file) => file.size > MAX_SIZE);
+      if (oversized) {
+        setError(`"${oversized.name}" exceeds the 4.5MB size limit. Please choose a smaller image.`);
+        setUploading(false);
+        return;
+      }
+
       // Upload each file independently so requests stay well under Vercel serverless payload limits
-      // Note: do NOT manually specify 'Content-Type': 'multipart/form-data', as Axios needs to set the boundary!
-      const uploadPromises = selected.map(async (file) => {
+      const uploadPromises = preparedFiles.map(async (file) => {
         const body = new FormData();
         body.append('images', file);
         const { data } = await api.post('/upload', body);
