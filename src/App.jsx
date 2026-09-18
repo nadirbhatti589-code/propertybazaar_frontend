@@ -11,6 +11,9 @@ import MyListings from './pages/MyListings';
 import Favorites from './pages/Favorites';
 import AgentVerification from './pages/AgentVerification';
 import AdminPanel from './pages/AdminPanel';
+import Compare from './pages/Compare';
+import Messages from './pages/Messages';
+import NotFound from './pages/NotFound';
 
 function App() {
   return (
@@ -20,6 +23,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/property/:id" element={<PropertyDetail />} />
+        <Route path="/compare" element={<Compare />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route
@@ -64,6 +68,14 @@ function App() {
           }
         />
         <Route
+          path="/messages"
+          element={
+            <ProtectedRoute>
+              <Messages />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/agent-verification"
           element={
             <ProtectedRoute>
@@ -71,6 +83,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
   );
